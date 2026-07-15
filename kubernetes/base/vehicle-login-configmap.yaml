@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: vehicle-login-config
+  namespace: vehicle-login
+
+data:
+  APP_NAME: "Vehicle Login Service"
+  APP_VERSION: "v1.0.0"
+  LOG_LEVEL: "INFO"
+
+  DATABASE_HOST: "postgres-service"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "vehicle_db"

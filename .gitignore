@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+
+# VS Code
+.vscode/
+
+# Python Environment
+.env
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Linux
+*.swp
+
+# Kubernetes
+*.bak
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Helm
+charts/*.tgz
+
+# Ollama models (if any)
+models/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Pytest
+.pytest_cache/

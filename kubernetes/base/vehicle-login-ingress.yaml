@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: vehicle-login-ingress
+  namespace: vehicle-login
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+  - host: vehicle-login.local
+
+    http:
+
+      paths:
+
+      - path: /
+
+        pathType: Prefix
+
+        backend:
+
+          service:
+
+            name: vehicle-login-service
+
+            port:
+
+              number: 80

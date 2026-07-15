@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: vehicle-login
+  namespace: vehicle-login
+  labels:
+    app: vehicle-login
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: vehicle-login
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: vehicle-login
+        version: v1
+
+    spec:
+      containers:
+        - name: vehicle-login
+
+          image: srujan12/vehicle-login:v1.0.1
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8000
+
+          envFrom:
+            - configMapRef:
+                name: vehicle-login-config
+
+            - secretRef:
+                name: vehicle-login-secret
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          startupProbe:
+            httpGet:
+              path: /live
+              port: 8000
+            failureThreshold: 30
+            periodSeconds: 2
+
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
