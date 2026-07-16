@@ -1,27 +1,29 @@
-from kubernetes import client, config
+from collector.kube_client import KubernetesClient
+from models.kubernetes import NodeInfo
+
+kube = KubernetesClient()
 
 
 def get_nodes():
-    """
-    Collect node information.
-    """
-
-    config.load_kube_config()
-
-    v1 = client.CoreV1Api()
 
     nodes = []
 
-    for node in v1.list_node().items:
+    for node in kube.core.list_node().items:
+
+        status = "Unknown"
+
+        for condition in node.status.conditions:
+            if condition.type == "Ready":
+                status = condition.status
 
         nodes.append(
-            {
-                "name": node.metadata.name,
-                "status": node.status.conditions[-1].type,
-                "kubelet": node.status.node_info.kubelet_version,
-                "os": node.status.node_info.os_image,
-                "container_runtime": node.status.node_info.container_runtime_version,
-            }
+            NodeInfo(
+                name=node.metadata.name,
+                status=status,
+                kubelet_version=node.status.node_info.kubelet_version,
+                os_image=node.status.node_info.os_image,
+                runtime=node.status.node_info.container_runtime_version,
+            )
         )
 
     return nodes

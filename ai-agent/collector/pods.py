@@ -1,33 +1,30 @@
-from kubernetes import client, config
-from kubernetes.config.config_exception import ConfigException
+from collector.kube_client import KubernetesClient
+
+from models.kubernetes import PodInfo
 
 
-def get_pods():
-    """
-    Collect detailed pod information from the Kubernetes cluster.
+kube = KubernetesClient()
 
-    Returns:
-        List[dict]
-    """
-
-    try:
-        config.load_kube_config()
-    except ConfigException:
-        config.load_incluster_config()
-
-    v1 = client.CoreV1Api()
+def get_pods(namespace=None):
 
     pods = []
 
-    for pod in v1.list_pod_for_all_namespaces().items:
+    if namespace:
+        pod_list = kube.core.list_namespaced_pod(namespace).items
+    else:
+        pod_list = kube.core.list_pod_for_all_namespaces().items
 
-        # Default values
+    for pod in pod_list:
+
         container_state = "Unknown"
         restart_count = 0
+        ready = False
 
         if pod.status.container_statuses:
 
             container = pod.status.container_statuses[0]
+
+            ready = container.ready
 
             restart_count = container.restart_count
 
@@ -42,20 +39,20 @@ def get_pods():
             elif state.terminated:
                 container_state = state.terminated.reason
 
-        pod_info = {
-            "namespace": pod.metadata.namespace,
-            "name": pod.metadata.name,
-            "phase": pod.status.phase,
-            "container_state": container_state,
-            "ready": f"{pod.status.container_statuses[0].ready if pod.status.container_statuses else False}",
-            "restarts": restart_count,
-            "node": pod.spec.node_name,
-            "pod_ip": pod.status.pod_ip,
-            "host_ip": pod.status.host_ip,
-            "start_time": str(pod.status.start_time),
-            "labels": dict(pod.metadata.labels or {}),
-        }
-
-        pods.append(pod_info)
+        pods.append(
+            PodInfo(
+                namespace=pod.metadata.namespace,
+                name=pod.metadata.name,
+                phase=pod.status.phase,
+                container_state=container_state,
+                ready=ready,
+                restart_count=restart_count,
+                node=pod.spec.node_name,
+                pod_ip=pod.status.pod_ip,
+                host_ip=pod.status.host_ip,
+                start_time=str(pod.status.start_time),
+                labels=dict(pod.metadata.labels or {}),
+            )
+        )
 
     return pods
