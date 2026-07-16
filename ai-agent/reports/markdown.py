@@ -1,35 +1,68 @@
+from pathlib import Path
+from datetime import datetime
+
+
 class MarkdownReport:
 
-    def generate(self, incident, knowledge):
+    def generate(self, incident, ai_response=""):
 
-        print("=" * 70)
-        print("AI Kubernetes SRE Copilot")
-        print("=" * 70)
+        reports_dir = Path("reports/output")
+        reports_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"Incident   : {incident.incident_type}")
-        print(f"Severity   : {incident.severity}")
-        print(f"Confidence : {incident.confidence}")
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        print()
+        filename = reports_dir / f"{incident.incident_type}_{timestamp}.md"
 
-        print("Summary")
-        print("-------")
-        print(incident.summary)
+        with open(filename, "w", encoding="utf-8") as file:
 
-        if knowledge:
+            file.write("# AI Kubernetes SRE Copilot\n\n")
 
-            print()
-            print("Possible Causes")
-            print("----------------")
+            file.write("## Incident\n")
+            file.write(f"{incident.incident_type}\n\n")
 
-            for item in knowledge["possible_causes"]:
-                print(f"- {item}")
+            file.write("## Severity\n")
+            file.write(f"{incident.severity}\n\n")
 
-            print()
-            print("Recommended Commands")
-            print("--------------------")
+            file.write("## Confidence\n")
+            file.write(f"{incident.confidence}\n\n")
 
-            for cmd in knowledge["recommended_commands"]:
-                print(f"- {cmd}")
+            file.write("## Namespace\n")
+            file.write(f"{incident.affected_namespace}\n\n")
 
-        print("=" * 70)
+            file.write("## Deployment\n")
+            file.write(f"{incident.affected_deployment}\n\n")
+
+            file.write("## Pod\n")
+            file.write(f"{incident.affected_pod}\n\n")
+
+            file.write("## Node\n")
+            file.write(f"{incident.node}\n\n")
+
+            file.write("## Deployment Status\n\n")
+
+            file.write(f"- Desired Replicas : {incident.desired_replicas}\n")
+            file.write(f"- Ready Replicas : {incident.ready_replicas}\n")
+            file.write(f"- Available Replicas : {incident.available_replicas}\n\n")
+
+            file.write("## Events\n\n")
+
+            for event in incident.events:
+                file.write(f"- {event}\n")
+
+            file.write("\n")
+
+            file.write("## Recommendations\n\n")
+
+            for recommendation in incident.recommendations:
+                file.write(f"- {recommendation}\n")
+
+            file.write("\n")
+
+            file.write("## AI Root Cause Analysis\n\n")
+
+            if ai_response:
+                file.write(ai_response)
+            else:
+                file.write("AI response unavailable.\n")
+
+        return str(filename)

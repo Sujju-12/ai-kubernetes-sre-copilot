@@ -1,2 +1,9 @@
-kubernetes==32.0.1
-rich==14.1.0
+fastapi
+uvicorn
+kubernetes
+google-generativeai
+requests
+rich
+pydantic
+pyyaml
+python-dotenv
