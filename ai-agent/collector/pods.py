@@ -1,9 +1,8 @@
 from collector.kube_client import KubernetesClient
-
 from models.kubernetes import PodInfo
 
-
 kube = KubernetesClient()
+
 
 def get_pods(namespace=None):
 
@@ -25,7 +24,6 @@ def get_pods(namespace=None):
             container = pod.status.container_statuses[0]
 
             ready = container.ready
-
             restart_count = container.restart_count
 
             state = container.state
@@ -37,7 +35,7 @@ def get_pods(namespace=None):
                 container_state = "Running"
 
             elif state.terminated:
-                container_state = state.terminated.reason
+                container_state = state.terminated.reason or "Terminated"
 
         pods.append(
             PodInfo(
@@ -52,6 +50,8 @@ def get_pods(namespace=None):
                 host_ip=pod.status.host_ip,
                 start_time=str(pod.status.start_time),
                 labels=dict(pod.metadata.labels or {}),
+                logs="",
+                previous_logs=""
             )
         )
 

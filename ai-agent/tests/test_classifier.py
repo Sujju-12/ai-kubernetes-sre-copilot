@@ -1,15 +1,22 @@
 from collector.snapshot import build_snapshot
 from classifier.incident_classifier import IncidentClassifier
 
-snapshot = build_snapshot()
 
-classifier = IncidentClassifier()
+def main():
 
-incident = classifier.classify(snapshot)
+    snapshot = build_snapshot()
 
-print("=" * 60)
-print("Incident Type :", incident.incident_type)
-print("Severity      :", incident.severity)
-print("Confidence    :", incident.confidence)
-print("Summary       :", incident.summary)
-print("=" * 60)
+    classifier = IncidentClassifier()
+
+    incident = classifier.classify(snapshot)
+
+    print("=" * 60)
+    print("Incident Type :", incident.incident_type)
+    print("Severity      :", incident.severity)
+    print("Confidence    :", incident.confidence)
+    print("Summary       :", incident.summary)
+    print("=" * 60)
+
+
+if __name__ == "__main__":
+    main()

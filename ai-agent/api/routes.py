@@ -3,10 +3,8 @@ from fastapi import APIRouter
 from collector.snapshot import build_snapshot
 from diagnosis.engine import DiagnosisEngine
 from llm.prompt_builder import PromptBuilder
-from llm.gemini_client import GeminiClient
-
+from llm.openrouter_client import OpenRouterClient
 from api.schemas import DiagnoseRequest
-
 
 router = APIRouter()
 
@@ -24,42 +22,46 @@ def diagnose(request: DiagnoseRequest):
 
     snapshot = build_snapshot(request.namespace)
 
-    incident = DiagnosisEngine().analyze(snapshot)
+    incidents = DiagnosisEngine().analyze(snapshot)
 
-    ai_response = ""
+    results = []
 
-    if incident.incident_type != "HEALTHY":
+    llm = OpenRouterClient()
+    prompt_builder = PromptBuilder()
 
-        try:
+    for incident in incidents:
 
-            prompt = PromptBuilder().build(incident)
+        ai_response = ""
 
-            ai_response = GeminiClient().generate(prompt)
+        if incident.incident_type != "HEALTHY":
 
-        except Exception as e:
+            try:
 
-            ai_response = str(e)
+                prompt = prompt_builder.build(incident)
+                ai_response = llm.generate(prompt)
+
+            except Exception as e:
+
+                ai_response = str(e)
+
+        results.append(
+            {
+                "incident": incident.incident_type,
+                "severity": incident.severity,
+                "confidence": incident.confidence,
+                "summary": incident.summary,
+                "namespace": incident.affected_namespace,
+                "deployment": incident.affected_deployment,
+                "pod": incident.affected_pod,
+                "node": incident.node,
+                "events": incident.events,
+                "logs": incident.logs,
+                "recommendations": incident.recommendations,
+                "ai_response": ai_response
+            }
+        )
 
     return {
-
-        "incident": incident.incident_type,
-
-        "severity": incident.severity,
-
-        "confidence": incident.confidence,
-
-        "namespace": incident.affected_namespace,
-
-        "deployment": incident.affected_deployment,
-
-        "pod": incident.affected_pod,
-
-        "node": incident.node,
-
-        "events": incident.events,
-
-        "recommendations": incident.recommendations,
-
-        "ai_response": ai_response
-
+        "total_incidents": len(results),
+        "incidents": results
     }

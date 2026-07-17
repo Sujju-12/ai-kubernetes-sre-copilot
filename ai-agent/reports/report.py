@@ -3,61 +3,54 @@ class DiagnosisReport:
     def display(self, incident):
 
         print()
-
         print("=" * 80)
-
         print("🤖 AI Kubernetes SRE Copilot")
-
         print("=" * 80)
 
-        print()
-
-        print("Incident :", incident.incident_type)
-
-        print("Severity :", incident.severity)
-
-        print("Confidence :", incident.confidence)
+        print(f"Incident      : {incident.incident_type}")
+        print(f"Severity      : {incident.severity}")
+        print(f"Confidence    : {incident.confidence}")
 
         print()
 
-        print("Namespace :", incident.affected_namespace)
-
-        print("Deployment :", incident.affected_deployment)
-
-        print("Pod :", incident.affected_pod)
-
-        print("Node :", incident.node)
+        print(f"Summary       : {incident.summary}")
 
         print()
 
-        print("Deployment Status")
+        print(f"Namespace     : {incident.affected_namespace}")
+        print(f"Deployment    : {incident.affected_deployment}")
+        print(f"Pod           : {incident.affected_pod}")
+        print(f"Node          : {incident.node}")
 
-        print("-----------------")
+        print()
 
-        print("Desired :", incident.desired_replicas)
-
-        print("Ready :", incident.ready_replicas)
-
-        print("Available :", incident.available_replicas)
+        print("Deployment")
+        print("----------")
+        print(f"Desired       : {incident.desired_replicas}")
+        print(f"Ready         : {incident.ready_replicas}")
+        print(f"Available     : {incident.available_replicas}")
 
         print()
 
         print("Events")
-
         print("------")
 
-        for event in incident.events:
-            print(event)
+        if incident.events:
+            for event in incident.events:
+                print(f"- {event}")
+        else:
+            print("No events found.")
 
         print()
 
         print("Recommendations")
+        print("---------------")
 
-        print("----------------")
-
-        for recommendation in incident.recommendations:
-            print("-", recommendation)
+        if incident.recommendations:
+            for recommendation in incident.recommendations:
+                print(f"- {recommendation}")
+        else:
+            print("No recommendations.")
 
         print()
-
         print("=" * 80)

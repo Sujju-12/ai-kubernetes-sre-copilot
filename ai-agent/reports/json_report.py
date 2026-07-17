@@ -15,19 +15,25 @@ class JsonReport:
         filename = reports_dir / f"{incident.incident_type}_{timestamp}.json"
 
         report = {
-            "incident": incident.incident_type,
-            "severity": incident.severity,
-            "confidence": incident.confidence,
-            "summary": incident.summary,
-            "namespace": incident.affected_namespace,
-            "deployment": incident.affected_deployment,
-            "pod": incident.affected_pod,
-            "node": incident.node,
-            "desired_replicas": incident.desired_replicas,
-            "ready_replicas": incident.ready_replicas,
-            "available_replicas": incident.available_replicas,
+            "incident": {
+                "type": incident.incident_type,
+                "severity": incident.severity,
+                "confidence": incident.confidence,
+                "summary": incident.summary
+            },
+            "resource": {
+                "namespace": incident.affected_namespace,
+                "deployment": incident.affected_deployment,
+                "pod": incident.affected_pod,
+                "node": incident.node
+            },
+            "deployment_status": {
+                "desired_replicas": incident.desired_replicas,
+                "ready_replicas": incident.ready_replicas,
+                "available_replicas": incident.available_replicas
+            },
             "events": incident.events,
-            "recommendations": incident.recommendations,
+            "suggested_commands": incident.recommendations,
             "logs": incident.logs,
             "ai_root_cause_analysis": ai_response
         }

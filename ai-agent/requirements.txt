@@ -1,7 +1,6 @@
 fastapi
 uvicorn
 kubernetes
-google-generativeai
 requests
 rich
 pydantic

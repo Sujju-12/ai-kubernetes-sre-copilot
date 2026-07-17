@@ -7,7 +7,8 @@ from reports.markdown import MarkdownReport
 from reports.json_report import JsonReport
 
 from llm.prompt_builder import PromptBuilder
-from llm.gemini_client import GeminiClient
+from llm.openrouter_client import OpenRouterClient
+
 
 
 def diagnose(namespace):
@@ -18,52 +19,54 @@ def diagnose(namespace):
 
     print("Analyzing cluster...")
 
-    incident = DiagnosisEngine().analyze(snapshot)
+    incidents = DiagnosisEngine().analyze(snapshot)
 
-    DiagnosisReport().display(incident)
+    for incident in incidents:
 
-    ai_response = ""
+        DiagnosisReport().display(incident)
 
-    if incident.incident_type != "HEALTHY":
+        ai_response = ""
 
-        print("\n")
+        if incident.incident_type != "HEALTHY":
+
+            print("\n")
+            print("=" * 80)
+            print("🤖 Sending Incident to Gemini")
+            print("=" * 80)
+
+            try:
+
+                prompt = PromptBuilder().build(incident)
+                ai_response = OpenRouterClient().generate(prompt)
+                
+
+                print()
+                print("=" * 80)
+                print("🤖 AI ROOT CAUSE ANALYSIS")
+                print("=" * 80)
+                print(ai_response)
+                print("=" * 80)
+
+            except Exception as e:
+
+                print(f"\nGemini unavailable : {e}")
+
+                ai_response = "Gemini unavailable."
+
+        md_file = MarkdownReport().generate(
+            incident,
+            ai_response
+        )
+
+        json_file = JsonReport().generate(
+            incident,
+            ai_response
+        )
+
+        print()
         print("=" * 80)
-        print("🤖 Sending Incident to Gemini")
+        print("Reports Generated")
         print("=" * 80)
-
-        try:
-
-            prompt = PromptBuilder().build(incident)
-
-            ai_response = GeminiClient().generate(prompt)
-
-            print()
-            print("=" * 80)
-            print("🤖 AI ROOT CAUSE ANALYSIS")
-            print("=" * 80)
-            print(ai_response)
-            print("=" * 80)
-
-        except Exception as e:
-
-            print(f"\nGemini unavailable: {e}")
-
-            ai_response = "Gemini response unavailable."
-
-    md_file = MarkdownReport().generate(
-        incident,
-        ai_response
-    )
-
-    json_file = JsonReport().generate(
-        incident,
-        ai_response
-    )
-
-    print()
-    print("=" * 80)
-    print("Reports Generated")
-    print("=" * 80)
-    print(f"Markdown : {md_file}")
-    print(f"JSON      : {json_file}")
-    print("=" * 80)
+        print(md_file)
+        print(json_file)
+        print("=" * 80)
