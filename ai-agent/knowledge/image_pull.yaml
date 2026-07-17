@@ -1,0 +1,21 @@
+title: Image Pull Failure
+
+description: Container image could not be pulled from the registry.
+
+possible_causes:
+  - Invalid image name
+  - Invalid image tag
+  - Private registry authentication failure
+  - Image does not exist
+  - Registry unavailable
+
+verification:
+  - kubectl describe pod
+  - kubectl get events
+  - docker pull <image>
+
+resolution:
+  - Verify image exists
+  - Verify image tag
+  - Configure imagePullSecrets
+  - Restart deployment

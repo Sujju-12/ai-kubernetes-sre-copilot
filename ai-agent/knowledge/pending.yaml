@@ -1,0 +1,26 @@
+title: Pending Pod
+
+description: Pod is waiting to be scheduled or initialized.
+
+possible_causes:
+  - Insufficient CPU
+  - Insufficient Memory
+  - Node taints
+  - Missing PersistentVolume
+  - Unsatisfied node affinity
+  - Scheduler constraints
+
+verification:
+  - kubectl describe pod
+  - kubectl get nodes
+  - kubectl top nodes
+  - kubectl get pvc
+  - kubectl get events
+
+resolution:
+  - Check scheduler events
+  - Verify node capacity
+  - Verify taints and tolerations
+  - Verify node affinity
+  - Verify PVC binding
+  - Add worker nodes if resources are exhausted

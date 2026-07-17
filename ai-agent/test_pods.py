@@ -1,10 +1,15 @@
 from collector.pods import get_pods
 
 
-pods = get_pods()
+def main():
 
-for pod in pods:
+    pods = get_pods()
 
-    print("=" * 50)
+    for pod in pods:
 
-    print(pod)
+        print("=" * 50)
+        print(pod)
+
+
+if __name__ == "__main__":
+    main()

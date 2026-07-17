@@ -1,0 +1,24 @@
+title: CrashLoopBackOff
+
+description: Container repeatedly crashes and Kubernetes restarts it.
+
+possible_causes:
+  - Application startup failure
+  - Missing ConfigMap
+  - Missing Secret
+  - Database connectivity issue
+  - Invalid environment variables
+  - Port binding failure
+
+verification:
+  - kubectl logs
+  - kubectl logs --previous
+  - kubectl describe pod
+  - kubectl get events
+
+resolution:
+  - Check application logs
+  - Verify ConfigMaps
+  - Verify Secrets
+  - Verify database connectivity
+  - Restart deployment after fixing the issue

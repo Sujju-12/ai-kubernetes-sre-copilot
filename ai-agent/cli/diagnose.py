@@ -31,8 +31,7 @@ def diagnose(namespace):
 
             print("\n")
             print("=" * 80)
-            print("🤖 Sending Incident to Gemini")
-            print("=" * 80)
+            
 
             try:
 
@@ -49,9 +48,9 @@ def diagnose(namespace):
 
             except Exception as e:
 
-                print(f"\nGemini unavailable : {e}")
+                print(f"\nOpenRouter unavailable : {e}")
 
-                ai_response = "Gemini unavailable."
+                ai_response = "OpenRouter unavailable."
 
         md_file = MarkdownReport().generate(
             incident,

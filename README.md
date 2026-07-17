@@ -1,52 +1,50 @@
 # 🤖 AI Kubernetes SRE Copilot
 
-An AI-powered Kubernetes troubleshooting assistant that automatically collects Kubernetes cluster information, detects common pod and deployment failures using a deterministic diagnosis engine, and generates professional Root Cause Analysis (RCA) using Google's Gemini AI.
+An AI-powered Kubernetes troubleshooting assistant that automatically collects Kubernetes cluster information, detects common Kubernetes failures using a deterministic rule engine, and generates intelligent Root Cause Analysis (RCA) with an AI provider.
 
 ---
 
-## Features
+# Features
 
-- Kubernetes Cluster Discovery
-- Pod Diagnostics
-- Deployment Diagnostics
-- Node Diagnostics
-- Service Discovery
-- Ingress Discovery
-- Event Collection
-- Pod Log Collection
-- Rule-Based Diagnosis Engine
-- AI-powered Root Cause Analysis (Gemini)
-- Markdown Report Generation
-- JSON Report Generation
-- REST API using FastAPI
-- CLI Interface
-
----
-
-## Supported Kubernetes Failures
-
-- ImagePullBackOff
-- ErrImagePull
-- CrashLoopBackOff
-- OOMKilled
-- Pending Pods
-- Deployment Degraded
-
-More failure scenarios will be added in future releases.
+* Kubernetes Cluster Discovery
+* Pod Diagnostics
+* Deployment Diagnostics
+* Node Diagnostics
+* Service Discovery
+* Ingress Discovery
+* Kubernetes Event Collection
+* Pod Log Collection
+* Rule-Based Diagnosis Engine
+* AI-assisted Root Cause Analysis (OpenRouter / Ollama Ready)
+* Markdown Report Generation
+* JSON Report Generation
+* REST API using FastAPI
+* Command Line Interface (CLI)
 
 ---
 
-## Technology Stack
+# Supported Kubernetes Failures
 
-- Python
-- Kubernetes Python Client
-- FastAPI
-- Gemini API
-- Rich
-- Pydantic
-- YAML
+* ImagePullBackOff
+* ErrImagePull
+* CrashLoopBackOff
+* OOMKilled
+* Pending Pods
 
+More Kubernetes failure scenarios will be added in future releases.
 
+---
+
+# Technology Stack
+
+* Python
+* Kubernetes Python Client
+* FastAPI
+* OpenRouter API (LLM Integration)
+* Ollama (Supported)
+* Requests
+* Pydantic
+* PyYAML
 
 ---
 
@@ -56,6 +54,7 @@ More failure scenarios will be added in future releases.
 ai-agent/
 │
 ├── api/
+├── classifier/
 ├── cli/
 ├── collector/
 ├── config/
@@ -104,21 +103,21 @@ pip install -r requirements.txt
 
 ---
 
-## Configure Gemini
+## Configure AI Provider
 
-Set the API key.
-
-Linux / WSL
+### Linux / WSL
 
 ```bash
-export GEMINI_API_KEY="YOUR_API_KEY"
+export OPENROUTER_API_KEY="YOUR_API_KEY"
 ```
 
-Windows PowerShell
+(Optional)
 
-```powershell
-$env:GEMINI_API_KEY="YOUR_API_KEY"
+```bash
+export OPENROUTER_MODEL="deepseek/deepseek-chat-v3.1"
 ```
+
+If you prefer a local AI model, replace the OpenRouter client with an Ollama client.
 
 ---
 
@@ -129,8 +128,6 @@ kubectl get nodes
 
 kubectl get pods -A
 ```
-
-
 
 ---
 
@@ -147,7 +144,7 @@ python main.py --namespace vehicle-login
 ## Start the REST API
 
 ```bash
-uvicorn api.app:app --reload
+PYTHONPATH=. uvicorn api.app:app --reload
 ```
 
 Swagger UI
@@ -170,6 +167,47 @@ curl -X POST "http://127.0.0.1:8000/diagnose" \
 
 ---
 
+# Architecture
+
+```
+User
+   │
+   ▼
+CLI / REST API
+   │
+   ▼
+Snapshot Builder
+   │
+   ├── Pods
+   ├── Deployments
+   ├── Services
+   ├── Events
+   ├── Ingress
+   ├── Nodes
+   └── Logs
+   │
+   ▼
+Cluster Snapshot
+   │
+   ▼
+Diagnosis Engine
+   │
+   ▼
+Incident
+   │
+   ▼
+Prompt Builder
+   │
+   ▼
+AI Provider
+(OpenRouter / Ollama)
+   │
+   ▼
+JSON & Markdown Reports
+```
+
+---
+
 # Sample Output
 
 ```text
@@ -177,23 +215,24 @@ Collecting Kubernetes resources...
 
 Analyzing cluster...
 
-Incident : IMAGE_PULL
+Incident      : IMAGE_PULL
 
-Severity : HIGH
+Severity      : HIGH
 
-Confidence : 0.99
+Confidence    : 0.99
 
-Namespace : vehicle-login
+Namespace     : vehicle-login
 
-Deployment : vehicle-login
+Deployment    : vehicle-login
 
-Pod : vehicle-login-xxxx
+Pod           : vehicle-login-xxxx
 
 Recommendations
 
-- Verify Docker image exists
-- Verify image tag
 - kubectl describe pod
+- kubectl get events
+- Verify Docker image exists
+- Verify Docker image tag
 - kubectl rollout restart deployment
 ```
 
@@ -201,9 +240,9 @@ Recommendations
 
 # Generated Reports
 
-Every execution automatically generates
+Every execution automatically generates:
 
-```
+```text
 reports/output/
 
 IMAGE_PULL_<timestamp>.md
@@ -213,23 +252,37 @@ IMAGE_PULL_<timestamp>.json
 
 ---
 
-# Supported APIs
+# REST APIs
 
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | /health | Health Check |
-| POST | /diagnose | Diagnose Kubernetes Namespace |
+| Method | Endpoint    | Description                     |
+| ------ | ----------- | ------------------------------- |
+| GET    | `/health`   | Health Check                    |
+| POST   | `/diagnose` | Diagnose a Kubernetes Namespace |
+
+---
+
+# Current Workflow
+
+1. Collect Kubernetes resources.
+2. Build a cluster snapshot.
+3. Analyze workloads using the rule engine.
+4. Detect Kubernetes incidents.
+5. Build an AI prompt.
+6. Generate AI-based Root Cause Analysis.
+7. Produce JSON and Markdown reports.
+8. Return the results through the CLI or REST API.
 
 ---
 
 # Future Enhancements
 
-- Additional Kubernetes failure scenarios
-- Multi-namespace diagnosis
-- Multi-cluster support
-- AI provider abstraction (Gemini/Ollama/OpenAI)
-- Historical incident reports
-- Auto-remediation suggestions
+* Additional Kubernetes failure scenarios
+* Multi-cluster support
+* Historical incident tracking
+* Auto-remediation suggestions
+* Grafana and Prometheus integration
+* Web Dashboard
+* AI Provider abstraction
 
 ---
 

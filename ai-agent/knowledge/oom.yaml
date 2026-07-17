@@ -1,0 +1,22 @@
+title: OOMKilled
+
+description: Container was terminated because it exceeded its memory limit.
+
+possible_causes:
+  - Memory leak
+  - Insufficient memory limits
+  - High application memory usage
+  - Large workload
+
+verification:
+  - kubectl describe pod
+  - kubectl top pod
+  - kubectl top node
+  - kubectl logs --previous
+
+resolution:
+  - Increase memory limits
+  - Increase memory requests
+  - Optimize application memory usage
+  - Investigate memory leaks
+  - Redeploy the application
